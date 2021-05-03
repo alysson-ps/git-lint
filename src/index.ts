@@ -1,14 +1,20 @@
+#!/usr/bin/env node
 import {
   prompt,
   InputQuestionOptions,
   ListQuestionOptions,
   Answers,
+  ConfirmQuestionOptions,
+  Question,
+  CheckboxQuestionOptions,
 } from 'inquirer';
-
 import branches from 'list-git-branches';
+import { getDictionary } from 'simple-spellchecker';
 
 import committer from './components/committer';
 import banner from './components/banner';
+
+const branchesArray: string[] = branches.sync('.');
 
 const typeChange: ListQuestionOptions<Answers> = {
   message: 'Escolha o tipo da modificação feita no seu repositorio: ',
@@ -35,15 +41,50 @@ const messageCommit: InputQuestionOptions<Answers> = {
     return answer.toLowerCase();
   },
   validate: (answer: string) => {
-    if (answer.length > 10) {
-      return true;
+    if (answer.length > 0) {
+      const words = answer.split(' ');
+      const res = getDictionary('pt-BR', (err: TypeError, dictionary: any) => {
+        if (!err) {
+          words.map((item) => {
+            const misspelled = !dictionary.spellCheck(item);
+            if (misspelled) {
+              const suggestions = dictionary.getSuggestions(item);
+              return JSON.stringify(suggestions);
+            } else {
+              return misspelled;
+            }
+          });
+        }
+      });
+      return res;
     } else {
       return 'Please enter a message of commit.';
     }
   },
 };
 
-const questions: Answers[] = [typeChange, scopeChanged, messageCommit];
+const doPush: ConfirmQuestionOptions<Answers> = {
+  message: 'Quer fazer o push: ',
+  name: 'doPush',
+  type: 'confirm',
+};
+
+const branch: ListQuestionOptions<Answers> = {
+  message: 'Escolha a branch para fazer o commit: ',
+  name: 'branch',
+  type: 'list',
+  choices: branchesArray.filter(
+    (item, index) => branchesArray.indexOf(item) === index
+  ),
+};
+
+const questions: Answers[] = [
+  typeChange,
+  scopeChanged,
+  messageCommit,
+  doPush,
+  branch,
+];
 
 banner();
 prompt(questions)
@@ -60,9 +101,3 @@ prompt(questions)
   .catch((err) => {
     console.log(err);
   });
-
-// branches('.', (err, res) => {
-//   if (!err) {
-//     console.log(res);
-//   }
-// });
