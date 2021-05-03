@@ -8,11 +8,13 @@ import {
   Question,
   CheckboxQuestionOptions,
 } from 'inquirer';
+
 import branches from 'list-git-branches';
 import { getDictionary } from 'simple-spellchecker';
 
 import committer from './components/committer';
 import banner from './components/banner';
+import pusher from './components/pusher';
 
 const branchesArray: string[] = branches.sync('.');
 
@@ -42,21 +44,7 @@ const messageCommit: InputQuestionOptions<Answers> = {
   },
   validate: (answer: string) => {
     if (answer.length > 0) {
-      const words = answer.split(' ');
-      const res = getDictionary('pt-BR', (err: TypeError, dictionary: any) => {
-        if (!err) {
-          words.map((item) => {
-            const misspelled = !dictionary.spellCheck(item);
-            if (misspelled) {
-              const suggestions = dictionary.getSuggestions(item);
-              return JSON.stringify(suggestions);
-            } else {
-              return misspelled;
-            }
-          });
-        }
-      });
-      return res;
+      return true;
     } else {
       return 'Please enter a message of commit.';
     }
@@ -64,7 +52,7 @@ const messageCommit: InputQuestionOptions<Answers> = {
 };
 
 const doPush: ConfirmQuestionOptions<Answers> = {
-  message: 'Quer fazer o push: ',
+  message: 'Dejesa realizar o push: ',
   name: 'doPush',
   type: 'confirm',
 };
@@ -89,6 +77,7 @@ const questions: Answers[] = [
 banner();
 prompt(questions)
   .then((answers: Ianswers) => {
+    console.log(answers);
     let messageCompleted = '';
     if (answers.scopeChanged === '') {
       messageCompleted = `${answers.typeChange}: ${answers.messageCommit}`;
@@ -96,6 +85,10 @@ prompt(questions)
       messageCompleted = `${answers.typeChange}[${answers.scopeChanged}]: ${answers.messageCommit}`;
     }
     committer(messageCompleted)
+
+    if (answers.doPush) {
+      pusher(answers.branch)
+    }
   })
   .catch((err) => {
     console.log(err);
