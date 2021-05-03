@@ -1,5 +1,5 @@
-import chalk from 'chalk';
-import figlet from 'figlet';
+import * as chalk from 'chalk';
+import * as figlet from 'figlet';
 
 const banner = () => {
   console.log(
