@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import {
   prompt,
   InputQuestionOptions,
@@ -14,7 +16,7 @@ const typeChange: ListQuestionOptions<Answers> = {
   message: 'Escolha o tipo da modificação feita no seu repositorio: ',
   name: 'typeChange',
   type: 'list',
-  choices: ['feat', 'refactor', 'fix', 'docs', 'style', 'test'],
+  choices: ['feat', 'refactor', 'fix', 'docs', 'style', 'test', 'revert'],
 };
 
 const scopeChanged: InputQuestionOptions<Answers> = {
@@ -54,15 +56,9 @@ prompt(questions)
     } else {
       messageCompleted = `${answers.typeChange}[${answers.scopeChanged}]: ${answers.messageCommit}`;
     }
-    console.log(messageCompleted);
-    // committer()
+    committer(messageCompleted)
   })
   .catch((err) => {
     console.log(err);
   });
 
-// branches('.', (err, res) => {
-//   if (!err) {
-//     console.log(res);
-//   }
-// });
