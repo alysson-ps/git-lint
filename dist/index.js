@@ -5,12 +5,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const inquirer_1 = require("inquirer");
+const list_git_branches_1 = __importDefault(require("list-git-branches"));
+const committer_1 = __importDefault(require("./components/committer"));
 const banner_1 = __importDefault(require("./components/banner"));
+const pusher_1 = __importDefault(require("./components/pusher"));
+const branchesArray = list_git_branches_1.default.sync('.');
 const typeChange = {
     message: 'Escolha o tipo da modificação feita no seu repositorio: ',
     name: 'typeChange',
     type: 'list',
-    choices: ['feat', 'refactor', 'fix', 'docs', 'style', 'test'],
+    choices: ['feat', 'refactor', 'fix', 'docs', 'style', 'test', 'revert'],
 };
 const scopeChanged = {
     message: 'Qual escopo foi modificado: ',
@@ -30,22 +34,7 @@ const messageCommit = {
     },
     validate: (answer) => {
         if (answer.length > 0) {
-            const words = answer.split(' ');
-            const res = simple_spellchecker_1.getDictionary('pt-BR', (err, dictionary) => {
-                if (!err) {
-                    words.map((item) => {
-                        const misspelled = !dictionary.spellCheck(item);
-                        if (misspelled) {
-                            const suggestions = dictionary.getSuggestions(item);
-                            return JSON.stringify(suggestions);
-                        }
-                        else {
-                            return misspelled;
-                        }
-                    });
-                }
-            });
-            return res;
+            return true;
         }
         else {
             return 'Please enter a message of commit.';
@@ -53,7 +42,7 @@ const messageCommit = {
     },
 };
 const doPush = {
-    message: 'Quer fazer o push: ',
+    message: 'Dejesa realizar o push: ',
     name: 'doPush',
     type: 'confirm',
 };
@@ -73,6 +62,7 @@ const questions = [
 banner_1.default();
 inquirer_1.prompt(questions)
     .then((answers) => {
+    console.log(answers);
     let messageCompleted = '';
     if (answers.scopeChanged === '') {
         messageCompleted = `${answers.typeChange}: ${answers.messageCommit}`;
@@ -80,8 +70,10 @@ inquirer_1.prompt(questions)
     else {
         messageCompleted = `${answers.typeChange}[${answers.scopeChanged}]: ${answers.messageCommit}`;
     }
-    console.log(messageCompleted);
-    // committer()
+    committer_1.default(messageCompleted);
+    if (answers.doPush) {
+        pusher_1.default(answers.branch);
+    }
 })
     .catch((err) => {
     console.log(err);
