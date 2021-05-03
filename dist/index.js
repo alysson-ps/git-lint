@@ -29,15 +29,47 @@ const messageCommit = {
         return answer.toLowerCase();
     },
     validate: (answer) => {
-        if (answer.length > 10) {
-            return true;
+        if (answer.length > 0) {
+            const words = answer.split(' ');
+            const res = simple_spellchecker_1.getDictionary('pt-BR', (err, dictionary) => {
+                if (!err) {
+                    words.map((item) => {
+                        const misspelled = !dictionary.spellCheck(item);
+                        if (misspelled) {
+                            const suggestions = dictionary.getSuggestions(item);
+                            return JSON.stringify(suggestions);
+                        }
+                        else {
+                            return misspelled;
+                        }
+                    });
+                }
+            });
+            return res;
         }
         else {
             return 'Please enter a message of commit.';
         }
     },
 };
-const questions = [typeChange, scopeChanged, messageCommit];
+const doPush = {
+    message: 'Quer fazer o push: ',
+    name: 'doPush',
+    type: 'confirm',
+};
+const branch = {
+    message: 'Escolha a branch para fazer o commit: ',
+    name: 'branch',
+    type: 'list',
+    choices: branchesArray.filter((item, index) => branchesArray.indexOf(item) === index),
+};
+const questions = [
+    typeChange,
+    scopeChanged,
+    messageCommit,
+    doPush,
+    branch,
+];
 banner_1.default();
 inquirer_1.prompt(questions)
     .then((answers) => {
@@ -54,8 +86,3 @@ inquirer_1.prompt(questions)
     .catch((err) => {
     console.log(err);
 });
-// branches('.', (err, res) => {
-//   if (!err) {
-//     console.log(res);
-//   }
-// });
