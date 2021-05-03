@@ -1,7 +1,7 @@
 {
   "name": "git-lint",
   "version": "1.0.0",
-  "main": "index.ts",
+  "main": "./dist/index.js",
   "repository": "https://github.com/alysson3dev/git-lint.git",
   "author": "Alisson Santos <craftgames.alysson@gmail.com>",
   "license": "MIT",
@@ -29,7 +29,7 @@
     "typescript": "^4.2.4"
   },
   "bin": {
-    "commit": "./src/index.ts"
+    "commit": "./dist/index.js"
   },
   "preferGlobal": true
 }
