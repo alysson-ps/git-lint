@@ -64,6 +64,7 @@ const branch: ListQuestionOptions<Answers> = {
   choices: branchesArray.filter(
     (item, index) => branchesArray.indexOf(item) === index
   ),
+  when: (answers: any) => answers.doPush,
 };
 
 const questions: Answers[] = [
@@ -84,10 +85,10 @@ prompt(questions)
     } else {
       messageCompleted = `${answers.typeChange}[${answers.scopeChanged}]: ${answers.messageCommit}`;
     }
-    committer(messageCompleted)
+    committer(messageCompleted);
 
     if (answers.doPush) {
-      pusher(answers.branch)
+      pusher(answers.branch);
     }
   })
   .catch((err) => {
