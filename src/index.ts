@@ -46,7 +46,7 @@ const messageCommit: InputQuestionOptions<Answers> = {
     if (answer.length > 0) {
       return true;
     } else {
-      return 'Please enter a message of commit.';
+      return 'Por favor, escreva uma mensagem de commit.';
     }
   },
 };
@@ -78,7 +78,7 @@ const questions: Answers[] = [
 banner();
 prompt(questions)
   .then((answers: Ianswers) => {
-    console.log(answers);
+
     let messageCompleted = '';
     if (answers.scopeChanged === '') {
       messageCompleted = `${answers.typeChange}: ${answers.messageCommit}`;
